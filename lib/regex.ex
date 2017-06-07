@@ -64,7 +64,8 @@ defmodule OA.Regex do
       ret
     end
   end
-  def convert_to_string_indexes(str, []), do: []
+  def convert_to_string_indexes(_str, []), do: []
+  def convert_to_string_indexes(_str, nil), do: nil
   def convert_to_string_indexes(str,[head|rest]) do
     [convert_to_string_indexes(str,head) | convert_to_string_indexes(str,rest)]
   end
@@ -75,7 +76,7 @@ defmodule OA.Regex do
     named_map
     |> Enum.reduce( named_map , fn
         {name, val} , acc ->
-          Map.put(named_map,  name, convert_to_string_indexes(str,val))
+          Map.put(acc,  name, convert_to_string_indexes(str,val))
     end)
   end
   defp grapheme_match_indexes(str,{from, len}) when from >=0 and len >=0  do
