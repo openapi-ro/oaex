@@ -2,8 +2,8 @@ defmodule OA.Ecto.MigrationHelpers do
   @doc """
   This function creates drop statements when presented with a CREATE FUNCTION sql string
   ##EXAMPLE:
-    iex(1)> Ecto.MigrationHelpers.drop_from_create("CREATE OR REPLACE FUNCTION openapi.combine( anyelement , anyelement) RETURNS anyelement AS  $$ SELECT $2 $$ LANGUAGE sql")
-    "DROP FUNCTION IF EXISTS openapi.combine( anyelement , anyelement) "
+      iex(1)> Ecto.MigrationHelpers.drop_from_create("CREATE OR REPLACE FUNCTION openapi.combine( anyelement , anyelement) RETURNS anyelement AS  $$ SELECT $2 $$ LANGUAGE sql")
+      "DROP FUNCTION IF EXISTS openapi.combine( anyelement , anyelement) "
   """
   def drop_from_create(func_def) do
     func_def
