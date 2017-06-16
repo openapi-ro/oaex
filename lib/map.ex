@@ -11,10 +11,10 @@ defmodule OA.Map do
   the same plus a fallback value to be used if the map doesn't have a value for that key.
 
   Example:
-  map = %{"a" => %{"b" => 1}, "x" => %{"y" => 1}}
-  trans_map = %{"a.b" => "bla", "a.c" => {"foo", 42}, "x.y" => "i.j"}
-  OA.Map.transform_paths(map, trans_map)
-  => %{"bla" => 1, "foo" => 42, "i" => %{"j" => 1}}
+      iex> map = %{"a" => %{"b" => 1}, "x" => %{"y" => 1}}
+      iex> trans_map = %{"a.b" => "bla", "a.c" => {"foo", 42}, "x.y" => "i.j"}
+      iex> OA.Map.transform_paths(map, trans_map)
+      %{"bla" => 1, "foo" => 42, "i" => %{"j" => 1}}
   """
   def transform_paths(source = %{}, trans_map = %{}) do
     Enum.reduce trans_map, %{}, fn {k, v}, acc ->
@@ -33,10 +33,8 @@ defmodule OA.Map do
   @doc """
   Similar to `Kernel.put_in/3`, but [autovivificious](https://en.wikipedia.org/wiki/Autovivification)
   Example:
-  ```
-  > put_in_path(%{}, [:foo, "bar", :baz], 3)
-  %{foo: %{"bar" => %{baz: 3}}}
-  ```
+      iex> OA.Map.put_in_path(%{}, [:foo, "bar", :baz], 3)
+      %{foo: %{"bar" => %{baz: 3}}}
   """
   def put_in_path(map = %{}, path, val) do
     state = {map, []}

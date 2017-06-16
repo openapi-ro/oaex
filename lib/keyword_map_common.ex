@@ -11,18 +11,18 @@ defmodule OA.KeywordMapCommon do
 
         This Function can merge `Keyword` lists and `Map`s.
         ## Examples
-          iex> Keyword.merge([a: 1, b: 2], [a: 3, d: 4], fn _k, v1, v2 ->
-          ...>   v1 + v2
-          ...> end)
-          [b: 2, a: 4, d: 4]
-          iex> Keyword.merge([a: 1, b: 2], [a: 3, d: 4, a: 5], fn :a, v1, v2 ->
-          ...>  v1 + v2
-          ...> end)
-          [b: 2, a: 4, d: 4]
-          iex> Keyword.merge([a: 1, b: 2, a: 3], [a: 3, d: 4, a: 5], fn :a, v1, v2 ->
-          ...>  v1 + v2
-          ...> end)
-          [b: 2, a: 4, d: 4]
+            iex> Keyword.merge([a: 1, b: 2], [a: 3, d: 4], fn _k, v1, v2 ->
+            ...>   v1 + v2
+            ...> end)
+            [b: 2, a: 4, d: 4]
+            iex> Keyword.merge([a: 1, b: 2], [a: 3, d: 4, a: 5], fn :a, v1, v2 ->
+            ...>  v1 + v2
+            ...> end)
+            [b: 2, a: 4, d: 4]
+            iex> Keyword.merge([a: 1, b: 2, a: 3], [a: 3, d: 4, a: 5], fn :a, v1, v2 ->
+            ...>  v1 + v2
+            ...> end)
+            [b: 2, a: 4, d: 4]
 
         NB: the doc has been first plagiarized from `Elixir.Map.merge/3` and than bastarded into the present form.
         """
