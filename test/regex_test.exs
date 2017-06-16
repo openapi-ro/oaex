@@ -1,5 +1,4 @@
 defmodule RegexTest do
-  alias OA.Regex
   use ExUnit.Case
   test "testing some ordinary regex functions" do
     assert OA.Regex.regex?(~r/foo/)
@@ -12,7 +11,7 @@ defmodule RegexTest do
 
     assert [["â"]] ==OA.Regex.scan(~r/â/u,str)
     assert [[{3,1}]] == OA.Regex.scan(~r/â/u,str, return: :string_index)
-    [[{byte_from, byte_len}]] = OA.Regex.scan(~r/â/u,str, return: :index)
+    [[{byte_from, _byte_len}]] = OA.Regex.scan(~r/â/u,str, return: :index)
     assert byte_from > 3
 
   end
@@ -21,7 +20,7 @@ defmodule RegexTest do
 
     assert ["â"] ==OA.Regex.run(~r/â/u,str)
     assert [{3,1}] == OA.Regex.run(~r/â/u,str, return: :string_index)
-    [{byte_from, byte_len}] = OA.Regex.run(~r/â/u,str, return: :index)
+    [{byte_from, _byte_len}] = OA.Regex.run(~r/â/u,str, return: :index)
     assert byte_from > 3
 
   end
