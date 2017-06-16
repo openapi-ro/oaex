@@ -13,10 +13,10 @@ defmodule OA.Stream.Permutations do
   def permutations(list) do
     list
     |> Enum.sort
-    |> Stream.unfold fn
+    |> Stream.unfold(fn
       [] -> nil
       p -> {p, next_permutation(p)}
-    end
+    end)
   end
 
   defp next_permutation(permutation) do
