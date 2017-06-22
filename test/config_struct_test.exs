@@ -26,7 +26,7 @@ defmodule ConfigStructTest do
     conf = [k1: 1, k2: {:system, "PATH"}]
     Application.put_env :app, :c1, conf
     conf_def = C1.read()
-    assert C1.get_root == [:app, :c1]
+    assert C1.get_root_path == [:app, :c1]
     assert C1.get_root_config  == conf
     assert C1.get_root_config  != conf_def # PATH is supposed to be replaced
   end
@@ -34,7 +34,7 @@ defmodule ConfigStructTest do
     conf = [k1: 1, k2: 2]
     Application.put_env :app, :c1, conf
     conf_def = C1.read()
-    assert C1.get_root == [:app, :c1]
+    assert C1.get_root_path == [:app, :c1]
     assert C1.get_root_config  == conf
     assert C1.get_root_config  == Map.from_struct(conf_def)|> Enum.map(&(&1)) # No replacements
   end

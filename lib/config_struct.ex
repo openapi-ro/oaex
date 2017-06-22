@@ -32,9 +32,13 @@ defmodule OA.ConfigStruct do
     `OA.ConfigStruct` implements `read()` which will return the configuration struct as read
     from the config
 
-    It is possible to override reading keys by implementing read(key).
-    `OA.ConfigStruct.get_root_config()` will return the configuration beneath the config root path
-    `get_root()` will return root path for the configuration as supplied to `use OA.ConfigStruct`
+    It is possible to override reading keys by implementing read(key):
+
+    * `OA.ConfigStruct.get_root_config()` will return the configuration beneath the config root path
+    * `get_root_path()` will return root path for the configuration as supplied to `use OA.ConfigStruct`
+    * `OA.ConfigStruct.read(config, key)` provides the default implementation for `MyConfig.read(key)`
+    where `config` is supplied from `MyConfig.get_root_config()`
+
   """
   defmacro __using__(root_key_path) do
     root_key_path=
@@ -48,9 +52,8 @@ defmodule OA.ConfigStruct do
               raise "use argument must be an atom or a list of atoms. '#{inspect no_key}' is not"
           end)
       end
-    ret=
     quote do
-      def get_root() do
+      def get_root_path() do
         unquote(root_key_path)
       end
       #this reads the root key from Application.
@@ -73,14 +76,16 @@ defmodule OA.ConfigStruct do
           end)
       end
       def read(key) when is_atom(key) do
-
-        case get_root_config()[key] do
-          nil-> Map.get(struct(__MODULE__),key)
-          {:system, val} -> System.get_env(val)
-          other-> other
-        end
+        OA.ConfigStruct.read get_root_config(), key
       end
       defoverridable [read: 1]
+    end
+  end
+  def read(config, key) do
+    case config[key] do
+      nil-> Map.get(struct(__MODULE__),key)
+      {:system, val} -> System.get_env(val)
+      other-> other
     end
   end
 end
