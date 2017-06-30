@@ -36,14 +36,20 @@ defmodule OA.Map do
       iex> OA.Map.put_in_path(%{}, [:foo, "bar", :baz], 3)
       %{foo: %{"bar" => %{baz: 3}}}
   """
-  def put_in_path(map = %{}, path, val) do
+  def put_in_path(map = %{}, path, val, options \\ []) do
+    force_list= Keyword.get(options, :force_list, false)
     state = {map, []}
     Enum.reduce(path, state, fn x, {acc, cursor} ->
       cursor = [ x | cursor ]
       final = length(cursor) == length(path)
       newval = case get_in(acc, Enum.reverse(cursor)) do
         h when is_list(h) -> [ val | h ]
-        nil -> if final, do: val, else: %{}
+        nil ->
+          if final do
+            if force_list, do: [val], else: val
+          else
+            %{}
+          end
         h = %{} -> if final, do: [val, h], else: h
         h -> if final, do: [ val, h ], else: [h]
       end
@@ -75,4 +81,6 @@ defmodule OA.Map do
     [atomize_keys(head) | atomize_keys(rest)]
   end
   def atomize_keys(not_map), do: not_map
+
+  defdelegate ensure_atom_keys(map), to: __MODULE__, as: :atomize_keys
 end
