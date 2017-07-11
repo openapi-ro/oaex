@@ -19,7 +19,7 @@ defmodule OA.Keyword do
     t ,
     (key, val1::value, val2::value -> merged :: value)
     ) :: [{any, any}]
-  def myers_merge( kwd1, kwd2, merge_fun) do
+  def myers_merge( kwd1, kwd2, merge_fun) when is_list(kwd1) and is_list(kwd2) do
     {result, [], []} =
     List.myers_difference(Enum.map(kwd1, &extract_key/1) , Enum.map(kwd2, &extract_key/1))
     |> Enum.reduce( {[], kwd1, kwd2},  fn
@@ -44,6 +44,21 @@ defmodule OA.Keyword do
     end)
     result
   end
+  @doc """
+    Same as `myers_merge/3` but for a list of lists.
+
+    The lists are merged by repeatedly merging the first two elements of the list until the list contains a single list
+  """
+  @spec myers_merge(
+    [t],
+    (key, val1::value, val2::value -> merged :: value)
+    ) :: [{any, any}]
+  def myers_merge([], _merge_fun), do:  nil
+  def myers_merge([list], _merge_fun), do:  list
+  def myers_merge([left,right|other], merge_fun) when is_list(left) and is_list(right) do
+    myers_merge([ myers_merge(left,right, merge_fun) |other], merge_fun)
+  end
+
   def extract_key({key, _val}) do
     key
   end
