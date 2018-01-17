@@ -9,15 +9,18 @@ defmodule OA.Keyword do
   @doc """
     Merges two keyword lists by their keys, using `List.myers_difference/2`.
 
-    All entries for which the keys are identified as `:eq`  are merged using `&merge_fun/3`.
+    All entries' _values_ for which the keys are identified as `:eq`  are merged using `&merge_fun/3`.
+    All other `{key,value}` pairs are inserted unmodified.
 
-    Note that this function accepts `t:any` as key, instead of `Keyword.t` which allows only `atom`
+    The *relative order*  of the input lists' elements is preserved in the merged list.
+
+    Note that this function accepts `t:any/0` as key, not just `t:atom/0` (as in `t:Keyword.t/0`)
   """
   #@opaque key::any
   @spec myers_merge(
     t,
     t ,
-    (key, val1::value, val2::value -> merged :: value)
+    (key, left_val::value, right_val::value -> merged :: value)
     ) :: [{any, any}]
   def myers_merge( kwd1, kwd2, merge_fun) when is_list(kwd1) and is_list(kwd2) do
     {result, [], []} =
@@ -45,14 +48,16 @@ defmodule OA.Keyword do
     result
   end
   @doc """
-    Same as `myers_merge/3` but for a list of lists.
+    Same as `myers_merge/3` but for a list of key-value lists.
 
-    The lists are merged by repeatedly merging the first two elements of the list until the list contains a single list
+    The lists contained in the `list` argument are merged by repeatedly merging the first two elements of the list until the list contains a single list
+
+    Returns the merged list or `nil` if `list` argument is `[]`
   """
   @spec myers_merge(
     [t],
     (key, val1::value, val2::value -> merged :: value)
-    ) :: [{any, any}]
+    ) :: [{any, any}]|nil
   def myers_merge([], _merge_fun), do:  nil
   def myers_merge([list], _merge_fun), do:  list
   def myers_merge([left,right|other], merge_fun) when is_list(left) and is_list(right) do
