@@ -6,7 +6,7 @@ defmodule OA.ConfigStruct do
     The config struct is a module, which can provide defaults within it's defstruct macro.
 
     `OA.ConfigStruct` is used by adding `use OA.ConfigStruct [app, key |more_keys]`
-    The conficuration root is `[app, key |more_keys]` as would be used in `Application.get_env(app,key)`
+    The configuration root is `[app, key |more_keys]` as would be used in `Application.get_env(app,key)`
     or in `Application.get_all_env(app,key)`
 
 
@@ -16,7 +16,7 @@ defmodule OA.ConfigStruct do
 
     Key values can be
 
-    * either `{:system, "ENV_VAR"}` which will be resolved at *load time* using 
+    * either `{:system, "ENV_VAR"}` which will be resolved at *load time* using
     System.getEnv("ENV_VAR")
     * or any other value which is not being translated by default.
     ##Example
