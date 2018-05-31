@@ -16,6 +16,11 @@ defmodule ApplicationTest do
       cwd: System.cwd(),
       included_applications: [],
       test: :test,
-      val_with_active_default: :default}
+      val_with_active_default: :default,
+      test_multiple_keys: System.cwd()
+    }
+  end
+  test "multiple key fetch" do
+    assert OA.Application.get_env(:oaex,:test_multiple_keys) == System.cwd()
   end
 end

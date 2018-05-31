@@ -37,9 +37,10 @@ defmodule OA.Application do
           _->true
         end)
       |>Enum.take(1)
-    if is_nil(ret) do
+    if ret== [] do
       default
     else
+      [ret] = ret
       ret
     end
   end
