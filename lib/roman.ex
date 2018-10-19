@@ -36,11 +36,10 @@ defmodule Roman do
     decodes a roman numeral string [or a charlist] to integer
     taken from http://rosettacode.org/wiki/Roman_numerals/Decode#Elixir
   """
-  def decode(str) when is_bitstring(str) do 
-    String.to_char_list(str)
-    |> decode()
+  def decode(str) when is_bitstring(str) do
+    decode(String.to_charlist(str))
   end
-  def decode([]), do: 0 
+  def decode([]), do: 0
   def decode([x]), do: to_value(x)
   def decode([h1, h2 | rest]) do
     case {to_value(h1), to_value(h2)} do
