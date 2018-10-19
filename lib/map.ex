@@ -17,17 +17,21 @@ defmodule OA.Map do
       %{"bla" => 1, "foo" => 42, "i" => %{"j" => 1}}
   """
   def transform_paths(source = %{}, trans_map = %{}) do
-    Enum.reduce trans_map, %{}, fn {k, v}, acc ->
-      path = case v do
-        {v, _} -> v |> String.split(".")
-        v -> v |> String.split(".")
-      end
-      val = case v do
-        {_, fallback} -> get_in(source, k |> String.split(".")) || fallback
-        _ -> get_in(source, k |> String.split("."))
-      end
+    Enum.reduce(trans_map, %{}, fn {k, v}, acc ->
+      path =
+        case v do
+          {v, _} -> v |> String.split(".")
+          v -> v |> String.split(".")
+        end
+
+      val =
+        case v do
+          {_, fallback} -> get_in(source, k |> String.split(".")) || fallback
+          _ -> get_in(source, k |> String.split("."))
+        end
+
       put_in_path(acc, path, val)
-    end
+    end)
   end
 
   @doc """
@@ -37,36 +41,48 @@ defmodule OA.Map do
       %{foo: %{"bar" => %{baz: 3}}}
   """
   def put_in_path(map = %{}, path, val, options \\ []) do
-    force_list= Keyword.get(options, :force_list, false)
+    force_list = Keyword.get(options, :force_list, false)
     state = {map, []}
+
     Enum.reduce(path, state, fn x, {acc, cursor} ->
-      cursor = [ x | cursor ]
+      cursor = [x | cursor]
       final = length(cursor) == length(path)
-      newval = case get_in(acc, Enum.reverse(cursor)) do
-        h when is_list(h) -> [ val | h ]
-        nil ->
-          if final do
-            if force_list, do: [val], else: val
-          else
-            %{}
-          end
-        h = %{} -> if final, do: [val, h], else: h
-        h -> if final, do: [ val, h ], else: [h]
-      end
-      { put_in(acc, Enum.reverse(cursor), newval), cursor }
+
+      newval =
+        case get_in(acc, Enum.reverse(cursor)) do
+          h when is_list(h) ->
+            [val | h]
+
+          nil ->
+            if final do
+              if force_list, do: [val], else: val
+            else
+              %{}
+            end
+
+          h = %{} ->
+            if final, do: [val, h], else: h
+
+          h ->
+            if final, do: [val, h], else: [h]
+        end
+
+      {put_in(acc, Enum.reverse(cursor), newval), cursor}
     end)
-    |> fn x -> elem(x, 0) end.()
+    |> (fn x -> elem(x, 0) end).()
   end
 
   @doc """
   Like `Map.get/3` but works both interchangeably with both string and atom keys.
   """
   def get_string_or_atom(map, key, default \\ nil)
+
   def get_string_or_atom(%{} = map, key, default) when is_atom(key) do
     Map.get(map, key, Map.get(map, key |> to_string)) || default
   end
+
   def get_string_or_atom(%{} = map, key, default) when is_bitstring(key) do
-    Map.get(map, key, Map.get(map, key |> OA.String.ensure_atom)) || default
+    Map.get(map, key, Map.get(map, key |> OA.String.ensure_atom())) || default
   end
 
   @doc """
@@ -74,13 +90,39 @@ defmodule OA.Map do
   """
   def atomize_keys(nil), do: nil
   def atomize_keys(struct = %{__struct__: _}), do: struct
+
   def atomize_keys(map = %{}) do
     for {k, v} <- map, into: %{}, do: {OA.String.ensure_atom(k), atomize_keys(v)}
   end
+
   def atomize_keys([head | rest]) do
     [atomize_keys(head) | atomize_keys(rest)]
   end
+
   def atomize_keys(not_map), do: not_map
 
   defdelegate ensure_atom_keys(map), to: __MODULE__, as: :atomize_keys
+
+  @doc """
+  Recursively transform a map with atom keys to a map with string keys.
+  """
+  @spec stringify_keys(map) :: map
+  def stringify_keys(nil), do: nil
+
+  def stringify_keys(%{} = map) do
+    map
+    |> Enum.into(%{}, fn {k, v} ->
+      case k do
+        k when is_atom(k) -> {k, stringify_keys(v)}
+        k when is_bitstring(k) -> {String.to_atom(k), stringify_keys(v)}
+        k -> {k, stringify_keys(v)}
+      end
+    end)
+  end
+
+  def stringify_keys([head | rest]) do
+    [stringify_keys(head) | stringify_keys(rest)]
+  end
+
+  def stringify_keys(not_a_map), do: not_a_map
 end
