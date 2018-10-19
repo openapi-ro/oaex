@@ -31,7 +31,7 @@ defmodule MapTest do
       stringify_keys(map_with_string_keys),
       stringify_keys(map_with_mixed_keys)
     ]
-    assert res |> Enum.uniq |> hd === map_with_atom_keys
+    assert res |> Enum.uniq === [map_with_atom_keys]
   end
 
   test "atomize_keys" do
