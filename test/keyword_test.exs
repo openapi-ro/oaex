@@ -11,7 +11,7 @@ defmodule KeywordTest do
       b: [:r1,:r2,:r3],
       c: [:r5,:r6,:r7],
     ]
-    result = OA.Keyword.myers_merge left, right, fn key, left_val, right_val -> 
+    result = OA.Keyword.myers_merge left, right, fn _key, left_val, right_val ->
       left_val++right_val
     end
     assert [
@@ -20,7 +20,7 @@ defmodule KeywordTest do
       b: [:l1, :l2, :l3, :r1, :r2, :r3],
       c: [:l5, :l6, :l7, :r5, :r6, :r7]
       ]==result
-    result = OA.Keyword.myers_merge left, right, fn key, left_val, right_val -> 
+    result = OA.Keyword.myers_merge left, right, fn _key, left_val, right_val ->
       right_val++ left_val
     end
     assert [
@@ -33,11 +33,10 @@ defmodule KeywordTest do
   test "myers_merge more than 2 lists" do
     lists =
       0..4
-      |> Enum.map( fn list_idx -> 
-        ret=
+      |> Enum.map( fn list_idx ->
           0..list_idx
           |> Enum.with_index(97)
-          |>Enum.map(fn {idx, char_code}-> 
+          |>Enum.map(fn {idx, _char_code}->
             list_val=
               0..idx
               |> Enum.map(fn val_idx -> String.to_atom(to_string([97+list_idx, 48+val_idx])) end)
@@ -48,7 +47,7 @@ defmodule KeywordTest do
             {list_atom,list_val}
           end )
       end)
-    merged = OA.Keyword.myers_merge lists, fn key, left_val, right_val -> 
+    merged = OA.Keyword.myers_merge lists, fn _key, left_val, right_val ->
        left_val ++ right_val
     end
     assert [

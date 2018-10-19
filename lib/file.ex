@@ -15,7 +15,7 @@ defmodule OA.File do
   same as `ensure_dir/1` but trows on error.
   """
   def ensure_dir!(file) do
-    {:ok, ret} = ensure_dir(file)
+    {:ok, _} = ensure_dir(file)
     file
   end
 end
