@@ -26,12 +26,9 @@ defmodule MapTest do
     map_with_string_keys = %{"foo" => %{"bar" => :baz, 3 => 3}}
     map_with_mixed_keys = %{"foo" => %{:bar => :baz, 3 => 3}}
 
-    res = [
-      stringify_keys(map_with_atom_keys),
-      stringify_keys(map_with_string_keys),
-      stringify_keys(map_with_mixed_keys)
-    ]
-    assert res |> Enum.uniq === [map_with_atom_keys]
+    assert stringify_keys(map_with_atom_keys) === map_with_string_keys
+    assert stringify_keys(map_with_mixed_keys) === map_with_string_keys
+    assert stringify_keys(map_with_string_keys) === map_with_string_keys
   end
 
   test "atomize_keys" do

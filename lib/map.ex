@@ -113,8 +113,8 @@ defmodule OA.Map do
     map
     |> Enum.into(%{}, fn {k, v} ->
       case k do
-        k when is_atom(k) -> {k, stringify_keys(v)}
-        k when is_bitstring(k) -> {String.to_atom(k), stringify_keys(v)}
+        k when is_atom(k) -> {to_string(k), stringify_keys(v)}
+        k when is_bitstring(k) -> {k, stringify_keys(v)}
         k -> {k, stringify_keys(v)}
       end
     end)
