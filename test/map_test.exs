@@ -2,6 +2,8 @@ defmodule MapTest do
   import OA.Map
   use ExUnit.Case
 
+  doctest OA.Map
+
   test "transform_paths" do
     source = %{"a" => %{"b" => 1}, "x" => %{"y" => 1}}
     transformation = %{"a.b" => "bla", "a.c" => {"foo", 42}, "x.y" => "i.j"}
@@ -29,6 +31,13 @@ defmodule MapTest do
     assert stringify_keys(map_with_atom_keys) === map_with_string_keys
     assert stringify_keys(map_with_mixed_keys) === map_with_string_keys
     assert stringify_keys(map_with_string_keys) === map_with_string_keys
+  end
+
+  test "stringify_all" do
+    input = %{:foo => "bar", :baz => [%{qux: 1}], 3 => 4}
+    expected = %{"foo" => "bar", "baz" => [%{"qux" => "1"}], "3" => "4"}
+
+    assert stringify_all(input) === expected
   end
 
   test "atomize_keys" do

@@ -36,6 +36,7 @@ defmodule OA.Map do
 
   @doc """
   Similar to `Kernel.put_in/3`, but [autovivificious](https://en.wikipedia.org/wiki/Autovivification)
+
   Example:
       iex> OA.Map.put_in_path(%{}, [:foo, "bar", :baz], 3)
       %{foo: %{"bar" => %{baz: 3}}}
@@ -105,6 +106,13 @@ defmodule OA.Map do
 
   @doc """
   Recursively transform a map with atom keys to a map with string keys.
+
+  Example:
+      iex> OA.Map.stringify_keys(%{a: 1, b: %{c: 2}})
+      %{"a" => 1, "b" => %{"c" => 2}}
+
+      iex>  OA.Map.stringify_keys(%{:a => 1, 99 => %{b: 3}})
+      %{99 => %{"b" => 3}, "a" => 1}
   """
   @spec stringify_keys(map) :: map
   def stringify_keys(nil), do: nil
@@ -125,4 +133,34 @@ defmodule OA.Map do
   end
 
   def stringify_keys(not_a_map), do: not_a_map
+
+  @doc """
+  Recursively stringify both keys and values of a map.
+  List values will be stringified recursively too.
+
+  Example:
+      iex> OA.Map.stringify_all(%{a: [%{b: 1}]})
+      %{"a" => [%{"b" => "1"}]}
+  """
+  @spec stringify_all(map) :: map
+  def stringify_all(nil), do: nil
+
+  def stringify_all(%{} = map) do
+    Enum.into(map, %{}, fn {k, v} ->
+      {to_string(k), stringify_all(v)}
+    end)
+  end
+
+  # we need func head because `to_string([]) = ""`
+  def stringify_all([head | []]) do
+    [stringify_all(head)]
+  end
+
+  def stringify_all([head | rest]) do
+    [stringify_all(head) | stringify_all(rest)]
+  end
+
+  def stringify_all(any) do
+    to_string(any)
+  end
 end
