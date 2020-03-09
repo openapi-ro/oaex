@@ -48,11 +48,12 @@ defmodule OA.Ecto.Migrator do
     |>Enum.sort_by(fn {_,order,_,_,_}-> order end)
     |>Enum.uniq()
   end
+  def find_migration_modules({repo, path}) when is_atom(repo), do: find_migration_modules(repo, path)
   def find_migration_modules(repo) when is_atom(repo) do
     path = Ecto.Migrator.migrations_path(repo)
-    find_migration_modules({repo, path})
+    find_migration_modules(repo, path)
   end
-  def find_migration_modules({repo, path}) when is_atom(repo) and is_bitstring(path) do
+  def find_migration_modules(repo, path) when is_atom(repo) and is_bitstring(path) do
     migrations =
       Ecto.Migrator.migrations(repo, path)
       |>Enum.filter(fn

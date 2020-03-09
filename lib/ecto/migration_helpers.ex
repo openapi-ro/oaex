@@ -66,4 +66,11 @@ defmodule OA.Ecto.MigrationHelpers do
     """,
     "ALTER TABLE #{from_prefix}#{from_table} DROP CONSTRAINT #{fk_name}"
   end
+  @doc """
+  creates a db url usable for psql from the repo config of `repo`
+  """
+  def url_from_repo(repo) do
+    config = repo.config() |> Map.new()
+    "postgres://#{config.username}:#{config.password}@#{config.hostname}/#{config.database}"
+  end
 end
