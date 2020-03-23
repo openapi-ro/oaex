@@ -107,6 +107,8 @@ defmodule OA.Map do
   @doc """
   Recursively transform a map with atom keys to a map with string keys.
 
+  ## Options:
+    * `struct_types:` set to `:keep` to keep them keyed as "__struct__"
   Example:
       iex> OA.Map.stringify_keys(%{a: 1, b: %{c: 2}})
       %{"a" => 1, "b" => %{"c" => 2}}
@@ -115,24 +117,35 @@ defmodule OA.Map do
       %{99 => %{"b" => 3}, "a" => 1}
   """
   @spec stringify_keys(map) :: map
-  def stringify_keys(nil), do: nil
+  def stringify_keys(any), do: stringify_keys(any, [])
+  def stringify_keys(nil, opts), do: nil
+  def stringify_keys(%{__struct__: mod}=struct, opts) do
+    case Keyword.get(opts, :struct_types) do
+      :keep ->
+        Map.from_struct(struct)
+        |> Map.put("__struct__", mod)
+      _ ->
+        Map.from_struct(struct)
+    end
+    |> stringify_keys(opts)
 
-  def stringify_keys(%{} = map) do
+  end
+  def stringify_keys(%{} = map, opts) do
     map
     |> Enum.into(%{}, fn {k, v} ->
       case k do
-        k when is_atom(k) -> {to_string(k), stringify_keys(v)}
-        k when is_bitstring(k) -> {k, stringify_keys(v)}
-        k -> {k, stringify_keys(v)}
+        k when is_atom(k) -> {to_string(k), stringify_keys(v,opts)}
+        k when is_bitstring(k) -> {k, stringify_keys(v,opts)}
+        k -> {k, stringify_keys(v,opts)}
       end
     end)
   end
 
-  def stringify_keys([head | rest]) do
-    [stringify_keys(head) | stringify_keys(rest)]
+  def stringify_keys([head | rest], opts) do
+    [stringify_keys(head,opts) | stringify_keys(rest,opts)]
   end
 
-  def stringify_keys(not_a_map), do: not_a_map
+  def stringify_keys(not_a_map, opts), do: not_a_map
 
   @doc """
   Recursively stringify both keys and values of a map.
@@ -143,24 +156,28 @@ defmodule OA.Map do
       %{"a" => [%{"b" => "1"}]}
   """
   @spec stringify_all(map) :: map
-  def stringify_all(nil), do: nil
-
-  def stringify_all(%{} = map) do
+  def stringify_all(term), do: stringify_all(term, [])
+  def stringify_all(nil, opts), do: nil
+  def stringify_all(%{__struct__: mod}=struct, opts) do
+    Map.from_struct(struct)
+    |> stringify_all(opts)
+  end
+  def stringify_all(%{} = map, opts) do
     Enum.into(map, %{}, fn {k, v} ->
-      {to_string(k), stringify_all(v)}
+      {to_string(k), stringify_all(v, opts)}
     end)
   end
 
   # we need func head because `to_string([]) = ""`
-  def stringify_all([head | []]) do
-    [stringify_all(head)]
+  def stringify_all([head | []], opts) do
+    [stringify_all(head, opts)]
   end
 
-  def stringify_all([head | rest]) do
-    [stringify_all(head) | stringify_all(rest)]
+  def stringify_all([head | rest], opts) do
+    [stringify_all(head, opts) | stringify_all(rest, opts)]
   end
 
-  def stringify_all(any) do
+  def stringify_all(any, opts) do
     to_string(any)
   end
 end
