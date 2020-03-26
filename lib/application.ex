@@ -73,9 +73,9 @@ defmodule OA.Application do
     defaults =
       defaults
       |> Enum.each(fn {key, value} ->
-        case Application.get_env(:geo_stage, key, :not_provided) do
+        case Application.get_env(application, key, :not_provided) do
           :not_provided ->
-            if warn_on_missing_config do
+            if warn_on_missing_config and key != :warn_on_missing_config do
               require Logger
               Logger.warn("Setting default for config :#{application}, :#{key}")
               Logger.warn("To suppress this warning configure `config :#{application}, :#{key}, #{inspect value}`")
