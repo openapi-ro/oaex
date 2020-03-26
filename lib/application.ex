@@ -14,6 +14,11 @@ defmodule OA.Application do
     Application.get_env(app,key)
     |> extract()
   end
+  def get_env(app, key, default) do
+    Application.get_env(app,key, default)
+    |> extract()
+  end
+
   @doc """
   Same as &Application.get_all_env/1,
   but applying methods discussed in &OA.Application.get_env/2
@@ -51,4 +56,34 @@ defmodule OA.Application do
     extract({:system,list,nil})
   end
   def extract(other), do: other
+  @doc """
+  Sets the default config for an application.
+
+  The default options are supplied as the `defaults` argument for the otp-app `application`
+
+  ### Options
+    The option `:warn_on_missing_config` (when not set or `true`) logs any missing keys which are provided
+    in the `defaults` argument.
+    The logging can also be suppresses by setting `warn_on_missing_config: true` in the configuration
+  """
+  @spec set_config_defaults(atom, atom, term()) :: :ok
+  def set_config_defaults(application, defaults, options \\ []) do
+    warn_on_missing_config = Keyword.get(options, :warn_on_missing_config, true)
+    warn_on_missing_config = Application.get_env(:application, :warn_on_missing_config, warn_on_missing_config)
+    defaults =
+      defaults
+      |> Enum.each(fn {key, value} ->
+        case Application.get_env(:geo_stage, key, :not_provided) do
+          :not_provided ->
+            if warn_on_missing_config do
+              require Logger
+              Logger.warn("Setting default for config :#{application}, :#{key}")
+              Logger.warn("To suppress this warning configure `config :#{application}, :#{key}, #{inspect value}`")
+            end
+            Application.put_env(application, key, value)
+          _other -> :ok #do nothing
+        end
+      end)
+    :ok
+  end
 end
