@@ -88,7 +88,19 @@ defmodule OA.Map do
 
   @doc """
   Transform a map with string keys to a map with atom keys.
+  This is done recursively un
   """
+  @spec atomize_keys(m::map):: map
+  @spec atomize_keys(m::map, recursive::boolean):: map
+
+  def atomize_keys(%{}=map, false ) do
+    map
+    |> Enum.map( fn {k,v} -> {OA.String.ensure_atom(k), v} end)
+    |> Map.new()
+  end
+  def atomize_keys(map, true) do
+    atomize_keys(map)
+  end
   def atomize_keys(nil), do: nil
   def atomize_keys(struct = %{__struct__: _}), do: struct
 
@@ -140,10 +152,14 @@ defmodule OA.Map do
       end
     end)
   end
+  def stringify_keys([{k, v} | rest], opts) do
+    [{to_string(k), stringify_keys(v)} | stringify_keys(rest,opts)]
+  end
 
   def stringify_keys([head | rest], opts) do
     [stringify_keys(head,opts) | stringify_keys(rest,opts)]
   end
+
 
   def stringify_keys(not_a_map, opts), do: not_a_map
 
