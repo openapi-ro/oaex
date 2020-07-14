@@ -21,5 +21,4 @@ defmodule OA.String do
   def ensure_existing_atom( atom) when is_atom(atom) do
    atom
   end
-
 end

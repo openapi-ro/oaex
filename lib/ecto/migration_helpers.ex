@@ -25,7 +25,7 @@ defmodule OA.Ecto.MigrationHelpers do
     end
   end
   @doc """
-  creates a composite foreign key (with multiple keys).
+  creates a composite foreign key (=with multiple keys).
   """
   def foreign_key(from_table, [_field1|_1]=from_fields, to_table, [_field2|_2]=to_fields, options ) do
     [from_table, to_table] =
@@ -59,6 +59,7 @@ defmodule OA.Ecto.MigrationHelpers do
     fk_name = String.replace(from_prefix,".","_") <>
       String.replace(from_fields, "," , "_") <> "_fk"
     fk_name = String.replace(fk_name, " ", "")
+    fk_name = Keyword.get(options, :name, fk_name)
     Ecto.Migration.execute """
     ALTER TABLE #{from_prefix}#{from_table}
     ADD CONSTRAINT #{fk_name} FOREIGN KEY (#{from_fields})

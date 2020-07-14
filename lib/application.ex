@@ -69,7 +69,7 @@ defmodule OA.Application do
   @spec set_config_defaults(atom, atom, term()) :: :ok
   def set_config_defaults(application, defaults, options \\ []) do
     warn_on_missing_config = Keyword.get(options, :warn_on_missing_config, true)
-    warn_on_missing_config = Application.get_env(:application, :warn_on_missing_config, warn_on_missing_config)
+    warn_on_missing_config = Application.get_env(application, :warn_on_missing_config, warn_on_missing_config)
     defaults =
       defaults
       |> Enum.each(fn {key, value} ->

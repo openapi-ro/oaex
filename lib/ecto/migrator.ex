@@ -11,14 +11,6 @@ defmodule OA.Ecto.Migrator do
     end
   end
   @moduledoc """
-  Find migrations corresponding to multiple repos and merges them into a list cotaining
-  {:up|:down, order, name, file, module}
-  """
-  def merged_migrations(repos) do
-    require IEx
-    IEx.pry
-  end
-  @moduledoc """
   Tests whether a module is a migration.
   Added here pecause the same-named function in Ecto is private.
   """
